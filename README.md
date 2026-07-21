@@ -26,3 +26,10 @@ chore:
 4. Commit
 5. Push
 6. Pull Request 생성
+
+## Team Rules
+- Unity 6000.4.6f1 사용
+- main 브랜치 직접 작업 금지
+- 개인 브랜치 생성 후 작업
+- Scene 동시 수정 금지
+- 작업 전 Pull

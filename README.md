@@ -18,3 +18,11 @@ feat:
 fix:
 docs:
 chore:
+
+## Git Workflow
+1. main에서 최신 내용 Pull
+2. 개인 브랜치 생성
+3. 작업
+4. Commit
+5. Push
+6. Pull Request 생성

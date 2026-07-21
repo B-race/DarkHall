@@ -50,10 +50,8 @@ feat/기능명-이름
 예시
 
 ```
-feat/map-juyeon
-feat/map-yujin
-feat/ui-seong
-feat/ui-chan
+feat/map-ㅇㅇㅇ
+feat/ui-ㅁㅁㅁ
 ```
 
 ---
@@ -105,12 +103,6 @@ chore: initialize project
 동일한 Scene은 동시에 두 명 이상 수정하지 않습니다.
 
 Scene 작업이 필요한 경우 개발방에 먼저 알려주세요.
-
-예시
-
-```
-오늘 Stage1 Scene 작업하겠습니다.
-```
 
 ---
 

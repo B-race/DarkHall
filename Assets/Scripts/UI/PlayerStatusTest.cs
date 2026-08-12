@@ -16,14 +16,36 @@ public class PlayerStatusTest : MonoBehaviour
 
     public void DamageHP()
     {
-        hp = Mathf.Max(0, hp - 10);
+        hp = Mathf.Clamp(hp - 10, 0, 100);
+        CheckGameOver();
+        UpdateUI();
+    }
+
+    public void HealHP()
+    {
+        hp = Mathf.Clamp(hp + 10, 0, 100);
         UpdateUI();
     }
 
     public void DamageSanity()
     {
-        sanity = Mathf.Max(0, sanity - 10);
+        sanity = Mathf.Clamp(sanity - 10, 0, 100);
+        CheckGameOver();
         UpdateUI();
+    }
+
+    public void HealSanity()
+    {
+        sanity = Mathf.Clamp(sanity + 10, 0, 100);
+        UpdateUI();
+    }
+
+    private void CheckGameOver()
+    {
+        if (hp <= 0 || sanity <= 0)
+        {
+            Debug.Log("Game Over");
+        }
     }
 
     private void UpdateUI()

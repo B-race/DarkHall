@@ -1748,8 +1748,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 49aaebeb44618554584dba2e504636b5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Door
-  targetScene: 
-  targetSpawnPoint: 
+  targetScene: Random_room(normal) 3
+  targetSpawnPoint: NormalRoom3_to_Hallway
 --- !u!61 &791122422
 BoxCollider2D:
   m_ObjectHideFlags: 0

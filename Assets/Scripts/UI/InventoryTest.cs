@@ -14,6 +14,9 @@ public class InventoryTest : MonoBehaviour
     [SerializeField] private int maxSlots = 9;
     [SerializeField] private Image[] slotImages;
 
+    [Header("인벤토리 가득 참 팝업")]
+    [SerializeField] private GameObject inventoryFullPanel;
+
     private class InventorySlotData
     {
         public string itemName;
@@ -32,6 +35,11 @@ public class InventoryTest : MonoBehaviour
 
     private void Start()
     {
+        if (inventoryFullPanel != null)
+        {
+            inventoryFullPanel.SetActive(false);
+        }
+
         UpdateInventoryUI();
     }
 
@@ -63,25 +71,35 @@ public class InventoryTest : MonoBehaviour
             }
         }
 
-        // 새 슬롯이 필요한데 인벤토리가 가득 찬 경우
+        // 새로운 슬롯이 필요한데 인벤토리가 가득 찬 경우
         if (slots.Count >= maxSlots)
         {
             Debug.Log("Inventory Full");
+
+            if (inventoryFullPanel != null)
+            {
+                inventoryFullPanel.SetActive(true);
+            }
+
             return false;
         }
 
-        // 새 슬롯 생성
-        InventorySlotData newSlot =
-            new InventorySlotData(itemName, itemType);
-
-        slots.Add(newSlot);
+        // 빈 슬롯이 있으면 새 아이템 추가
+        slots.Add(new InventorySlotData(itemName, itemType));
 
         Debug.Log("Item Acquired: " + itemName);
         Debug.Log("Inventory Slots: " + slots.Count + " / " + maxSlots);
 
         UpdateInventoryUI();
-
         return true;
+    }
+
+    public void CloseInventoryFullPanel()
+    {
+        if (inventoryFullPanel != null)
+        {
+            inventoryFullPanel.SetActive(false);
+        }
     }
 
     private int GetMaxStack(TestItemType itemType)
@@ -103,14 +121,8 @@ public class InventoryTest : MonoBehaviour
     {
         for (int i = 0; i < slotImages.Length; i++)
         {
-            if (i < slots.Count)
-            {
-                slotImages[i].color = Color.white;
-            }
-            else
-            {
-                slotImages[i].color = Color.gray;
-            }
+            slotImages[i].color =
+                i < slots.Count ? Color.white : Color.gray;
         }
     }
 }

@@ -17,8 +17,6 @@ public class SurveyHoldTest : MonoBehaviour, IPointerDownHandler, IPointerUpHand
         progressSlider.minValue = 0f;
         progressSlider.maxValue = holdDuration;
         progressSlider.value = 0f;
-
-        // 게임 시작 시 조사 게이지 숨김
         progressSlider.gameObject.SetActive(false);
     }
 
@@ -38,17 +36,26 @@ public class SurveyHoldTest : MonoBehaviour, IPointerDownHandler, IPointerUpHand
 
     public void OnPointerDown(PointerEventData eventData)
     {
+        // 이미 조사 완료한 장소
         if (isCompleted)
         {
+            // 남은 아이템이 있을 때만 바로 수집창 다시 열기
+            if (collectionPanelManager.HasRemainingItems())
+            {
+                collectionPanelManager.OpenCollectionPanel();
+            }
+            else
+            {
+                Debug.Log("Collection Complete");
+            }
+
             return;
         }
 
+        // 처음 조사하는 경우
         holdTime = 0f;
         progressSlider.value = 0f;
-
-        // 홀드 시작 시 게이지 표시
         progressSlider.gameObject.SetActive(true);
-
         isHolding = true;
     }
 
@@ -60,8 +67,6 @@ public class SurveyHoldTest : MonoBehaviour, IPointerDownHandler, IPointerUpHand
         }
 
         isHolding = false;
-
-        // 조사 완료 전에 손을 떼면 초기화 + 게이지 숨김
         ResetSurvey();
     }
 
@@ -69,16 +74,13 @@ public class SurveyHoldTest : MonoBehaviour, IPointerDownHandler, IPointerUpHand
     {
         holdTime = holdDuration;
         progressSlider.value = holdDuration;
-
         isHolding = false;
         isCompleted = true;
 
-        // 조사 완료 후 게이지 숨김
         progressSlider.gameObject.SetActive(false);
 
         Debug.Log("Survey Complete");
 
-        // 수집창 출력
         collectionPanelManager.OpenCollectionPanel();
     }
 
@@ -86,7 +88,6 @@ public class SurveyHoldTest : MonoBehaviour, IPointerDownHandler, IPointerUpHand
     {
         holdTime = 0f;
         progressSlider.value = 0f;
-
         progressSlider.gameObject.SetActive(false);
     }
 }

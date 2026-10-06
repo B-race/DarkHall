@@ -14,6 +14,15 @@ public class InventoryTest : MonoBehaviour
     [SerializeField] private int maxSlots = 9;
     [SerializeField] private Image[] slotImages;
 
+    [Header("인벤토리 가득 참 팝업")]
+    [SerializeField] private GameObject inventoryFullPanel;
+
+    [Header("아이템 상세창")]
+    [SerializeField] private GameObject itemDetailPanel;
+    [SerializeField] private Button discardButton;
+
+    private int selectedSlotIndex = -1;
+
     private class InventorySlotData
     {
         public string itemName;
@@ -32,14 +41,43 @@ public class InventoryTest : MonoBehaviour
 
     private void Start()
     {
+        if (inventoryFullPanel != null)
+        {
+            inventoryFullPanel.SetActive(false);
+        }
+
+        if (itemDetailPanel != null)
+        {
+            itemDetailPanel.SetActive(false);
+        }
+
+        SetupSlotButtons();
         UpdateInventoryUI();
+    }
+
+    private void SetupSlotButtons()
+    {
+        for (int i = 0; i < slotImages.Length; i++)
+        {
+            int index = i;
+
+            Button button = slotImages[i].GetComponent<Button>();
+
+            if (button == null)
+            {
+                button = slotImages[i].gameObject.AddComponent<Button>();
+            }
+
+            button.targetGraphic = slotImages[i];
+            button.onClick.RemoveAllListeners();
+            button.onClick.AddListener(() => SelectSlot(index));
+        }
     }
 
     public bool AddItem(string itemName, TestItemType itemType)
     {
         int maxStack = GetMaxStack(itemType);
 
-        // 중첩 가능한 아이템이면 기존 슬롯부터 확인
         if (maxStack > 1)
         {
             for (int i = 0; i < slots.Count; i++)
@@ -63,25 +101,109 @@ public class InventoryTest : MonoBehaviour
             }
         }
 
-        // 새 슬롯이 필요한데 인벤토리가 가득 찬 경우
         if (slots.Count >= maxSlots)
         {
             Debug.Log("Inventory Full");
+
+            if (inventoryFullPanel != null)
+            {
+                inventoryFullPanel.SetActive(true);
+            }
+
             return false;
         }
 
-        // 새 슬롯 생성
-        InventorySlotData newSlot =
-            new InventorySlotData(itemName, itemType);
-
-        slots.Add(newSlot);
+        slots.Add(new InventorySlotData(itemName, itemType));
 
         Debug.Log("Item Acquired: " + itemName);
         Debug.Log("Inventory Slots: " + slots.Count + " / " + maxSlots);
 
         UpdateInventoryUI();
-
         return true;
+    }
+
+    private void SelectSlot(int index)
+    {
+        if (index < 0 || index >= slots.Count)
+        {
+            return;
+        }
+
+        selectedSlotIndex = index;
+
+        InventorySlotData selectedItem = slots[selectedSlotIndex];
+
+        Debug.Log(
+            "Selected Item: " +
+            selectedItem.itemName +
+            " / Quantity: " +
+            selectedItem.quantity
+        );
+
+        if (discardButton != null)
+        {
+            discardButton.interactable =
+                selectedItem.itemType == TestItemType.Material;
+        }
+
+        if (itemDetailPanel != null)
+        {
+            itemDetailPanel.SetActive(true);
+        }
+    }
+
+    public void DiscardSelectedItem()
+    {
+        if (selectedSlotIndex < 0 ||
+            selectedSlotIndex >= slots.Count)
+        {
+            return;
+        }
+
+        InventorySlotData selectedItem = slots[selectedSlotIndex];
+
+        if (selectedItem.itemType != TestItemType.Material)
+        {
+            Debug.Log("Only material items can be discarded.");
+            return;
+        }
+
+        selectedItem.quantity--;
+
+        Debug.Log(
+            "Item Discarded: " +
+            selectedItem.itemName +
+            " / Remaining: " +
+            selectedItem.quantity
+        );
+
+        if (selectedItem.quantity <= 0)
+        {
+            slots.RemoveAt(selectedSlotIndex);
+        }
+
+        selectedSlotIndex = -1;
+
+        UpdateInventoryUI();
+        CloseItemDetailPanel();
+    }
+
+    public void CloseItemDetailPanel()
+    {
+        selectedSlotIndex = -1;
+
+        if (itemDetailPanel != null)
+        {
+            itemDetailPanel.SetActive(false);
+        }
+    }
+
+    public void CloseInventoryFullPanel()
+    {
+        if (inventoryFullPanel != null)
+        {
+            inventoryFullPanel.SetActive(false);
+        }
     }
 
     private int GetMaxStack(TestItemType itemType)
@@ -103,14 +225,8 @@ public class InventoryTest : MonoBehaviour
     {
         for (int i = 0; i < slotImages.Length; i++)
         {
-            if (i < slots.Count)
-            {
-                slotImages[i].color = Color.white;
-            }
-            else
-            {
-                slotImages[i].color = Color.gray;
-            }
+            slotImages[i].color =
+                i < slots.Count ? Color.white : Color.gray;
         }
     }
 }

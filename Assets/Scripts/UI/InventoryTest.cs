@@ -43,7 +43,8 @@ public class InventoryTest : MonoBehaviour
         }
     }
 
-    private List<InventorySlotData> slots = new List<InventorySlotData>();
+    private List<InventorySlotData> slots =
+        new List<InventorySlotData>();
 
     private void Start()
     {
@@ -67,20 +68,28 @@ public class InventoryTest : MonoBehaviour
         {
             int index = i;
 
-            Button button = slotImages[i].GetComponent<Button>();
+            Button button =
+                slotImages[i].GetComponent<Button>();
 
             if (button == null)
             {
-                button = slotImages[i].gameObject.AddComponent<Button>();
+                button =
+                    slotImages[i].gameObject.AddComponent<Button>();
             }
 
             button.targetGraphic = slotImages[i];
+
             button.onClick.RemoveAllListeners();
-            button.onClick.AddListener(() => SelectSlot(index));
+
+            button.onClick.AddListener(
+                () => SelectSlot(index)
+            );
         }
     }
 
-    public bool AddItem(string itemName, TestItemType itemType)
+    public bool AddItem(
+        string itemName,
+        TestItemType itemType)
     {
         int maxStack = GetMaxStack(itemType);
 
@@ -119,25 +128,94 @@ public class InventoryTest : MonoBehaviour
             return false;
         }
 
-        slots.Add(new InventorySlotData(itemName, itemType));
+        slots.Add(
+            new InventorySlotData(
+                itemName,
+                itemType
+            )
+        );
 
         Debug.Log("Item Acquired: " + itemName);
-        Debug.Log("Inventory Slots: " + slots.Count + " / " + maxSlots);
+
+        Debug.Log(
+            "Inventory Slots: " +
+            slots.Count +
+            " / " +
+            maxSlots
+        );
 
         UpdateInventoryUI();
+
+        return true;
+    }
+
+    public int GetItemCount(string itemName)
+    {
+        int total = 0;
+
+        for (int i = 0; i < slots.Count; i++)
+        {
+            if (slots[i].itemName == itemName)
+            {
+                total += slots[i].quantity;
+            }
+        }
+
+        return total;
+    }
+
+    public bool RemoveItem(
+        string itemName,
+        int amount)
+    {
+        if (GetItemCount(itemName) < amount)
+        {
+            return false;
+        }
+
+        int remaining = amount;
+
+        for (int i = slots.Count - 1; i >= 0; i--)
+        {
+            if (slots[i].itemName != itemName)
+            {
+                continue;
+            }
+
+            if (slots[i].quantity > remaining)
+            {
+                slots[i].quantity -= remaining;
+                remaining = 0;
+            }
+            else
+            {
+                remaining -= slots[i].quantity;
+                slots.RemoveAt(i);
+            }
+
+            if (remaining <= 0)
+            {
+                break;
+            }
+        }
+
+        UpdateInventoryUI();
+
         return true;
     }
 
     private void SelectSlot(int index)
     {
-        if (index < 0 || index >= slots.Count)
+        if (index < 0 ||
+            index >= slots.Count)
         {
             return;
         }
 
         selectedSlotIndex = index;
 
-        InventorySlotData selectedItem = slots[selectedSlotIndex];
+        InventorySlotData selectedItem =
+            slots[selectedSlotIndex];
 
         Debug.Log(
             "Selected Item: " +
@@ -149,19 +227,22 @@ public class InventoryTest : MonoBehaviour
         if (discardButton != null)
         {
             discardButton.interactable =
-                selectedItem.itemType == TestItemType.Material;
+                selectedItem.itemType ==
+                TestItemType.Material;
         }
 
         if (consumeButton != null)
         {
             consumeButton.interactable =
-                selectedItem.itemType == TestItemType.Food;
+                selectedItem.itemType ==
+                TestItemType.Food;
         }
 
         if (equipButton != null)
         {
             equipButton.interactable =
-                selectedItem.itemType == TestItemType.Tool;
+                selectedItem.itemType ==
+                TestItemType.Tool;
         }
 
         if (itemDetailPanel != null)
@@ -178,9 +259,11 @@ public class InventoryTest : MonoBehaviour
             return;
         }
 
-        InventorySlotData selectedItem = slots[selectedSlotIndex];
+        InventorySlotData selectedItem =
+            slots[selectedSlotIndex];
 
-        if (selectedItem.itemType != TestItemType.Material)
+        if (selectedItem.itemType !=
+            TestItemType.Material)
         {
             return;
         }
@@ -213,14 +296,17 @@ public class InventoryTest : MonoBehaviour
             return;
         }
 
-        InventorySlotData selectedItem = slots[selectedSlotIndex];
+        InventorySlotData selectedItem =
+            slots[selectedSlotIndex];
 
-        if (selectedItem.itemType != TestItemType.Food)
+        if (selectedItem.itemType !=
+            TestItemType.Food)
         {
             return;
         }
 
-        if (playerStatus != null && playerStatus.IsHPFull())
+        if (playerStatus != null &&
+            playerStatus.IsHPFull())
         {
             Debug.Log("HP is already full.");
             return;
@@ -259,16 +345,22 @@ public class InventoryTest : MonoBehaviour
             return;
         }
 
-        InventorySlotData selectedItem = slots[selectedSlotIndex];
+        InventorySlotData selectedItem =
+            slots[selectedSlotIndex];
 
-        if (selectedItem.itemType != TestItemType.Tool)
+        if (selectedItem.itemType !=
+            TestItemType.Tool)
         {
             return;
         }
 
-        equippedToolName = selectedItem.itemName;
+        equippedToolName =
+            selectedItem.itemName;
 
-        Debug.Log("Tool Equipped: " + equippedToolName);
+        Debug.Log(
+            "Tool Equipped: " +
+            equippedToolName
+        );
 
         selectedSlotIndex = -1;
 
@@ -313,7 +405,9 @@ public class InventoryTest : MonoBehaviour
         for (int i = 0; i < slotImages.Length; i++)
         {
             slotImages[i].color =
-                i < slots.Count ? Color.white : Color.gray;
+                i < slots.Count
+                ? Color.white
+                : Color.gray;
         }
     }
 }

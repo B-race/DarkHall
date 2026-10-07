@@ -34,9 +34,22 @@ public class PlayerStatusTest : MonoBehaviour
 
     public void HealHP()
     {
-        hp = Mathf.Clamp(hp + 10, 0, 100);
+        HealHP(10);
+    }
+
+    public void HealHP(int amount)
+    {
+        hp = Mathf.Clamp(hp + amount, 0, 100);
+
+        Debug.Log("HP Healed: " + amount);
+        Debug.Log("Current HP: " + hp);
 
         UpdateUI();
+    }
+
+    public bool IsHPFull()
+    {
+        return hp >= 100;
     }
 
     public void DamageSanity()

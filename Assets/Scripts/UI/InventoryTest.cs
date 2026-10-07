@@ -20,8 +20,14 @@ public class InventoryTest : MonoBehaviour
     [Header("아이템 상세창")]
     [SerializeField] private GameObject itemDetailPanel;
     [SerializeField] private Button discardButton;
+    [SerializeField] private Button consumeButton;
+    [SerializeField] private Button equipButton;
+
+    [Header("플레이어 상태")]
+    [SerializeField] private PlayerStatusTest playerStatus;
 
     private int selectedSlotIndex = -1;
+    private string equippedToolName = "";
 
     private class InventorySlotData
     {
@@ -146,6 +152,18 @@ public class InventoryTest : MonoBehaviour
                 selectedItem.itemType == TestItemType.Material;
         }
 
+        if (consumeButton != null)
+        {
+            consumeButton.interactable =
+                selectedItem.itemType == TestItemType.Food;
+        }
+
+        if (equipButton != null)
+        {
+            equipButton.interactable =
+                selectedItem.itemType == TestItemType.Tool;
+        }
+
         if (itemDetailPanel != null)
         {
             itemDetailPanel.SetActive(true);
@@ -164,7 +182,6 @@ public class InventoryTest : MonoBehaviour
 
         if (selectedItem.itemType != TestItemType.Material)
         {
-            Debug.Log("Only material items can be discarded.");
             return;
         }
 
@@ -185,6 +202,76 @@ public class InventoryTest : MonoBehaviour
         selectedSlotIndex = -1;
 
         UpdateInventoryUI();
+        CloseItemDetailPanel();
+    }
+
+    public void ConsumeSelectedFood()
+    {
+        if (selectedSlotIndex < 0 ||
+            selectedSlotIndex >= slots.Count)
+        {
+            return;
+        }
+
+        InventorySlotData selectedItem = slots[selectedSlotIndex];
+
+        if (selectedItem.itemType != TestItemType.Food)
+        {
+            return;
+        }
+
+        if (playerStatus != null && playerStatus.IsHPFull())
+        {
+            Debug.Log("HP is already full.");
+            return;
+        }
+
+        selectedItem.quantity--;
+
+        Debug.Log(
+            "Food Consumed: " +
+            selectedItem.itemName +
+            " / Remaining: " +
+            selectedItem.quantity
+        );
+
+        if (playerStatus != null)
+        {
+            playerStatus.HealHP(20);
+        }
+
+        if (selectedItem.quantity <= 0)
+        {
+            slots.RemoveAt(selectedSlotIndex);
+        }
+
+        selectedSlotIndex = -1;
+
+        UpdateInventoryUI();
+        CloseItemDetailPanel();
+    }
+
+    public void EquipSelectedTool()
+    {
+        if (selectedSlotIndex < 0 ||
+            selectedSlotIndex >= slots.Count)
+        {
+            return;
+        }
+
+        InventorySlotData selectedItem = slots[selectedSlotIndex];
+
+        if (selectedItem.itemType != TestItemType.Tool)
+        {
+            return;
+        }
+
+        equippedToolName = selectedItem.itemName;
+
+        Debug.Log("Tool Equipped: " + equippedToolName);
+
+        selectedSlotIndex = -1;
+
         CloseItemDetailPanel();
     }
 

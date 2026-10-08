@@ -135,7 +135,10 @@ public class InventoryTest : MonoBehaviour
             )
         );
 
-        Debug.Log("Item Acquired: " + itemName);
+        Debug.Log(
+            "Item Acquired: " +
+            itemName
+        );
 
         Debug.Log(
             "Inventory Slots: " +
@@ -175,7 +178,9 @@ public class InventoryTest : MonoBehaviour
 
         int remaining = amount;
 
-        for (int i = slots.Count - 1; i >= 0; i--)
+        for (int i = slots.Count - 1;
+             i >= 0;
+             i--)
         {
             if (slots[i].itemName != itemName)
             {
@@ -385,14 +390,17 @@ public class InventoryTest : MonoBehaviour
         }
     }
 
-    private int GetMaxStack(TestItemType itemType)
+    private int GetMaxStack(
+        TestItemType itemType)
     {
-        if (itemType == TestItemType.Material)
+        if (itemType ==
+            TestItemType.Material)
         {
             return 3;
         }
 
-        if (itemType == TestItemType.Food)
+        if (itemType ==
+            TestItemType.Food)
         {
             return 5;
         }
@@ -402,7 +410,9 @@ public class InventoryTest : MonoBehaviour
 
     private void UpdateInventoryUI()
     {
-        for (int i = 0; i < slotImages.Length; i++)
+        for (int i = 0;
+             i < slotImages.Length;
+             i++)
         {
             slotImages[i].color =
                 i < slots.Count

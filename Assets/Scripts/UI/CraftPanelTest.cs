@@ -10,10 +10,15 @@ public class CraftPanelTest : MonoBehaviour
     [SerializeField] private Button material2Button;
     [SerializeField] private Button craftButton;
 
+    [Header("제작 결과")]
+    [SerializeField] private GameObject unknownResultPanel;
+    [SerializeField] private GameObject knownResultPanel;
+
     [Header("인벤토리")]
     [SerializeField] private InventoryTest inventory;
 
     private int selectedMaterialCount = 0;
+    private bool recipeDiscovered = false;
 
     private void Start()
     {
@@ -22,6 +27,7 @@ public class CraftPanelTest : MonoBehaviour
             craftPanel.SetActive(false);
         }
 
+        UpdateResultUI();
         ResetCraft();
     }
 
@@ -33,6 +39,7 @@ public class CraftPanelTest : MonoBehaviour
         }
 
         ResetCraft();
+        UpdateResultUI();
 
         Debug.Log("Craft Panel Open");
     }
@@ -85,7 +92,15 @@ public class CraftPanelTest : MonoBehaviour
         craftButton.interactable = true;
 
         Debug.Log("Material 2 Selected: Wood");
-        Debug.Log("Recipe Ready: Wood x2");
+
+        if (recipeDiscovered)
+        {
+            Debug.Log("Recipe Result: CraftedTool");
+        }
+        else
+        {
+            Debug.Log("Recipe Result: ???");
+        }
     }
 
     public void CraftItem()
@@ -102,21 +117,29 @@ public class CraftPanelTest : MonoBehaviour
             return;
         }
 
-        bool removed =
-            inventory.RemoveItem("Wood", 2);
+        bool removed = inventory.RemoveItem("Wood", 2);
 
         if (!removed)
         {
             return;
         }
 
-        bool added =
-            inventory.AddItem("CraftedTool", TestItemType.Tool);
+        bool added = inventory.AddItem(
+            "CraftedTool",
+            TestItemType.Tool
+        );
 
         if (!added)
         {
-            inventory.AddItem("Wood", TestItemType.Material);
-            inventory.AddItem("Wood", TestItemType.Material);
+            inventory.AddItem(
+                "Wood",
+                TestItemType.Material
+            );
+
+            inventory.AddItem(
+                "Wood",
+                TestItemType.Material
+            );
 
             Debug.Log("Inventory Full - Craft Cancelled");
 
@@ -124,9 +147,25 @@ public class CraftPanelTest : MonoBehaviour
             return;
         }
 
+        recipeDiscovered = true;
+
         Debug.Log("Craft Complete: CraftedTool");
 
+        UpdateResultUI();
         ResetCraft();
+    }
+
+    private void UpdateResultUI()
+    {
+        if (unknownResultPanel != null)
+        {
+            unknownResultPanel.SetActive(!recipeDiscovered);
+        }
+
+        if (knownResultPanel != null)
+        {
+            knownResultPanel.SetActive(recipeDiscovered);
+        }
     }
 
     private void ResetCraft()

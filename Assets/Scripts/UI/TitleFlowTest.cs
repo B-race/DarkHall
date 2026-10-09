@@ -14,6 +14,9 @@ public class TitleFlowTest : MonoBehaviour
     [SerializeField] private Button saveSlot2Button;
     [SerializeField] private Button saveSlot3Button;
 
+    [Header("게임 종료 UI")]
+    [SerializeField] private GameObject exitConfirmTestPanel;
+
     private string playerName = "";
 
     private void Start()
@@ -28,6 +31,11 @@ public class TitleFlowTest : MonoBehaviour
             continueTestPanel.SetActive(false);
         }
 
+        if (exitConfirmTestPanel != null)
+        {
+            exitConfirmTestPanel.SetActive(false);
+        }
+
         playerName = PlayerPrefs.GetString("PlayerName", "");
 
         UpdateSaveSlotButtons();
@@ -39,10 +47,7 @@ public class TitleFlowTest : MonoBehaviour
 
     public void OpenNameInputPanel()
     {
-        if (continueTestPanel != null)
-        {
-            continueTestPanel.SetActive(false);
-        }
+        CloseAllTitlePanels();
 
         if (nameInputTestPanel != null)
         {
@@ -77,13 +82,15 @@ public class TitleFlowTest : MonoBehaviour
 
         PlayerPrefs.SetString("PlayerName", playerName);
 
-        // 테스트용:
-        // 새 게임을 만들면 첫 번째 빈 세이브 슬롯에 저장
         int emptySlot = FindEmptySaveSlot();
 
         if (emptySlot != -1)
         {
-            PlayerPrefs.SetInt("SaveSlot" + emptySlot + "_Exists", 1);
+            PlayerPrefs.SetInt(
+                "SaveSlot" + emptySlot + "_Exists",
+                1
+            );
+
             PlayerPrefs.SetString(
                 "SaveSlot" + emptySlot + "_PlayerName",
                 playerName
@@ -127,10 +134,7 @@ public class TitleFlowTest : MonoBehaviour
 
     public void OpenContinuePanel()
     {
-        if (nameInputTestPanel != null)
-        {
-            nameInputTestPanel.SetActive(false);
-        }
+        CloseAllTitlePanels();
 
         if (continueTestPanel != null)
         {
@@ -199,8 +203,63 @@ public class TitleFlowTest : MonoBehaviour
     }
 
     // =========================
-    // 세이브 슬롯 관리
+    // 게임 종료
     // =========================
+
+    public void OpenExitConfirmPanel()
+    {
+        CloseAllTitlePanels();
+
+        if (exitConfirmTestPanel != null)
+        {
+            exitConfirmTestPanel.SetActive(true);
+        }
+
+        Debug.Log("Exit Confirm Open");
+    }
+
+    public void CancelExit()
+    {
+        if (exitConfirmTestPanel != null)
+        {
+            exitConfirmTestPanel.SetActive(false);
+        }
+
+        Debug.Log("Exit Cancelled");
+    }
+
+    public void ConfirmExit()
+    {
+        Debug.Log("Game Exit");
+
+#if UNITY_EDITOR
+        UnityEditor.EditorApplication.isPlaying = false;
+#else
+        Application.Quit();
+#endif
+    }
+
+    // =========================
+    // 공통
+    // =========================
+
+    private void CloseAllTitlePanels()
+    {
+        if (nameInputTestPanel != null)
+        {
+            nameInputTestPanel.SetActive(false);
+        }
+
+        if (continueTestPanel != null)
+        {
+            continueTestPanel.SetActive(false);
+        }
+
+        if (exitConfirmTestPanel != null)
+        {
+            exitConfirmTestPanel.SetActive(false);
+        }
+    }
 
     private int FindEmptySaveSlot()
     {

@@ -29,6 +29,8 @@ public class InventoryTest : MonoBehaviour
     private int selectedSlotIndex = -1;
     private string equippedToolName = "";
 
+    private StorageTest activeStorage;
+
     private class InventorySlotData
     {
         public string itemName;
@@ -91,7 +93,8 @@ public class InventoryTest : MonoBehaviour
         string itemName,
         TestItemType itemType)
     {
-        int maxStack = GetMaxStack(itemType);
+        int maxStack =
+            GetMaxStack(itemType);
 
         if (maxStack > 1)
         {
@@ -138,13 +141,6 @@ public class InventoryTest : MonoBehaviour
         Debug.Log(
             "Item Acquired: " +
             itemName
-        );
-
-        Debug.Log(
-            "Inventory Slots: " +
-            slots.Count +
-            " / " +
-            maxSlots
         );
 
         UpdateInventoryUI();
@@ -209,11 +205,75 @@ public class InventoryTest : MonoBehaviour
         return true;
     }
 
+    public string GetItemNameAt(int index)
+    {
+        if (index < 0 ||
+            index >= slots.Count)
+        {
+            return "";
+        }
+
+        return slots[index].itemName;
+    }
+
+    public TestItemType GetItemTypeAt(int index)
+    {
+        if (index < 0 ||
+            index >= slots.Count)
+        {
+            return TestItemType.Material;
+        }
+
+        return slots[index].itemType;
+    }
+
+    public bool RemoveOneItemAt(int index)
+    {
+        if (index < 0 ||
+            index >= slots.Count)
+        {
+            return false;
+        }
+
+        slots[index].quantity--;
+
+        if (slots[index].quantity <= 0)
+        {
+            slots.RemoveAt(index);
+        }
+
+        UpdateInventoryUI();
+
+        return true;
+    }
+
+    public void BeginStorageMode(
+        StorageTest storageManager)
+    {
+        activeStorage = storageManager;
+
+        CloseItemDetailPanel();
+    }
+
+    public void EndStorageMode()
+    {
+        activeStorage = null;
+    }
+
     private void SelectSlot(int index)
     {
         if (index < 0 ||
             index >= slots.Count)
         {
+            return;
+        }
+
+        // 창고가 열려 있으면 상세창 대신 창고로 이동
+        if (activeStorage != null)
+        {
+            activeStorage
+                .TryStoreItemFromInventory(index);
+
             return;
         }
 
@@ -275,13 +335,6 @@ public class InventoryTest : MonoBehaviour
 
         selectedItem.quantity--;
 
-        Debug.Log(
-            "Item Discarded: " +
-            selectedItem.itemName +
-            " / Remaining: " +
-            selectedItem.quantity
-        );
-
         if (selectedItem.quantity <= 0)
         {
             slots.RemoveAt(selectedSlotIndex);
@@ -318,13 +371,6 @@ public class InventoryTest : MonoBehaviour
         }
 
         selectedItem.quantity--;
-
-        Debug.Log(
-            "Food Consumed: " +
-            selectedItem.itemName +
-            " / Remaining: " +
-            selectedItem.quantity
-        );
 
         if (playerStatus != null)
         {

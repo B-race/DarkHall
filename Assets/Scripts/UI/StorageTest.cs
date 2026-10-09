@@ -8,6 +8,9 @@ public class StorageTest : MonoBehaviour
     [SerializeField] private Image[] storageSlotImages;
     [SerializeField] private InventoryTest inventory;
 
+    [Header("상단 메뉴")]
+    [SerializeField] private TopMenuTest topMenu;
+
     private int maxSlots = 15;
 
     private class StorageSlotData
@@ -53,7 +56,8 @@ public class StorageTest : MonoBehaviour
                     storageSlotImages[i].gameObject.AddComponent<Button>();
             }
 
-            button.targetGraphic = storageSlotImages[i];
+            button.targetGraphic =
+                storageSlotImages[i];
 
             button.onClick.RemoveAllListeners();
 
@@ -65,6 +69,12 @@ public class StorageTest : MonoBehaviour
 
     public void OpenStorage()
     {
+        // 가방도 같이 열기
+        if (topMenu != null)
+        {
+            topMenu.OpenInventory();
+        }
+
         if (storagePanel != null)
         {
             storagePanel.SetActive(true);
@@ -88,6 +98,12 @@ public class StorageTest : MonoBehaviour
         if (inventory != null)
         {
             inventory.EndStorageMode();
+        }
+
+        // 가방도 같이 닫기
+        if (topMenu != null)
+        {
+            topMenu.CloseAllPanels();
         }
 
         Debug.Log("Storage Close");
@@ -221,8 +237,7 @@ public class StorageTest : MonoBehaviour
         UpdateStorageUI();
     }
 
-    private int GetMaxStack(
-        TestItemType itemType)
+    private int GetMaxStack(TestItemType itemType)
     {
         if (itemType == TestItemType.Material)
         {
